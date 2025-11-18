@@ -2,7 +2,7 @@ function [t, I_coeffs, I_waveform] = NRZ_polar_BPSK(data)
 % Função utilizada para gerar ondas quadradas para posterior multiplicação
 % com a portadora única
 arguments (Input)
-    data    (:,:) double
+    data    (1,:) double
 end
 
     % Fc estará explicada no relatório, mas basicamente: Se fosse um sistema
@@ -27,13 +27,11 @@ end
     T_total = (spb*sz(2)) / FS_SIM;
     t = linspace(0, T_total, Len_total);
     
-    for i=1:sz(1)
-        for j=1:sz(2)
-            if data(i, j) == 1
-                I_waveform(i, (j-1)*spb + 1:j*spb) = ones(1, spb);
-            else
-                I_waveform(i, (j-1)*spb + 1:j*spb) = -1* ones(1, spb);
-            end
+    for j=1:sz(2)
+        if data(i, j) == 1
+            I_waveform(i, (j-1)*spb + 1:j*spb) = ones(1, spb);
+        else
+            I_waveform(i, (j-1)*spb + 1:j*spb) = -1* ones(1, spb);
         end
     end
 
