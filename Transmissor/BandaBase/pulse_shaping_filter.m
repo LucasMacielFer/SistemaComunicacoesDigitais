@@ -1,4 +1,4 @@
-function [tx_signal, h_rrc, delay_samples] = pulse_shaping(symbols, N)
+function [tx_signal, h_rrc, delay_samples] = pulse_shaping_filter(symbols, N)
 % Função utilizada para aplicar um filtro RRC para modelar o pulso NRZ
 % codificado.    
 arguments (Input)

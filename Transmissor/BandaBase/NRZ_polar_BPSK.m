@@ -28,10 +28,10 @@ end
     t = linspace(0, T_total, Len_total);
     
     for j=1:sz(2)
-        if data(i, j) == 1
-            I_waveform(i, (j-1)*spb + 1:j*spb) = ones(1, spb);
+        if data(1, j) == 1
+            I_waveform(1, (j-1)*spb + 1:j*spb) = ones(1, spb);
         else
-            I_waveform(i, (j-1)*spb + 1:j*spb) = -1* ones(1, spb);
+            I_waveform(1, (j-1)*spb + 1:j*spb) = -1* ones(1, spb);
         end
     end
 
