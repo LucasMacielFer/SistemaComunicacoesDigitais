@@ -1,19 +1,33 @@
-function [tx_signal, filter_coeffs, filter_delay] = pulse_shaping(symbols, sps, rolloff, span)
+function [tx_signal, h_rrc, delay_samples] = pulse_shaping(symbols, N)
 % Função utilizada para aplicar um filtro RRC para modelar o pulso NRZ
 % codificado.    
 arguments
-    symbols (:,:) double % Aceita complexo (QAM) ou real (BPSK)
-    sps (1,1) {mustBeInteger, mustBePositive} = 4
-    rolloff (1,1) {mustBeNumeric, mustBeGreaterThanOrEqual(rolloff, 0), mustBeLessThanOrEqual(rolloff, 1)} = 0.25
-    span (1,1) {mustBeInteger, mustBePositive, mustBeNumeric} = 10
+    symbols (:,:) double                % Coeficientes após mapeamento
+    N {mustBeMember(N, [1, 4, 8, 16])}  % Coeficiente NRZ
 end
-    filter_coeffs = rcosdesign(rolloff, span, sps, 'sqrt');
+    % --- 1. PARÂMETROS FIXOS DO SISTEMA ---
+    SPB = 15;        % Amostras por Bit (Fixo)
+    ALPHA = 0.25;    % Fator de Roll-off (Padrão)
+    SPAN = 10;       % Duração do filtro em símbolos (Padrão)
     
-    % 2. Aplicar Upsampling e Filtragem (Pulse Shaping)
-    % A função 'upfirdn' (Upsample, FIR, Downsample) é a forma mais
-    % eficiente do MATLAB. Ela insere zeros (trem de impulsos) e
-    % aplica a convolução numa só passada.
-    % Nota: O terceiro argumento '1' é o fator de downsample (não queremos, então é 1).
-    tx_signal = upfirdn(symbols, filter_coeffs, sps, 1);
-    filter_delay = (length(filter_coeffs) - 1) / 2;
+    switch N
+            case 1,  k = 1; % BPSK
+            case 4,  k = 4; % 16-QAM
+            case 8,  k = 6; % 64-QAM (log2(64)=6)
+            case 16, k = 8; % 256-QAM (log2(256)=8)
+            otherwise, error('Nível de modulação não suportado.');
+    end
+
+    SPS = SPB * k;
+
+    h_rrc = rcosdesign(ALPHA, SPAN, SPS, 'sqrt');
+
+    sinal_filtrado = upfirdn(symbols, h_rrc, SPS, 1);
+    delay_samples = (SPAN * SPS) / 2;
+
+    L_input_syms = size(symbols, 2); % Número de símbolos no input
+    L_target_samples = L_input_syms * SPS;     % Comprimento total desejado
+
+    % Trunca o início (Delay) e mantém APENAS os L_target_samples seguintes
+    tx_signal = sinal_filtrado(:, delay_samples + 1 : delay_samples + L_target_samples);
 end

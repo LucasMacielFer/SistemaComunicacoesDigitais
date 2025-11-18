@@ -1,4 +1,4 @@
-function [t, I_waveform] = NRZ_polar_BPSK(data)
+function [t, I_coeffs, I_waveform] = NRZ_polar_BPSK(data)
 % Função utilizada para gerar ondas quadradas para posterior multiplicação
 % com a portadora única
 arguments (Input)
@@ -36,4 +36,6 @@ end
             end
         end
     end
+
+    I_coeffs = data * 2 - 1;
 end
