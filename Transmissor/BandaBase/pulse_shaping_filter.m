@@ -21,6 +21,7 @@ end
     SPS = SPB * k;
 
     h_rrc = rcosdesign(ALPHA, SPAN, SPS, 'sqrt');
+    h_rrc = h_rrc / sum(h_rrc);
 
     sinal_filtrado = upfirdn(symbols, h_rrc, SPS, 1);
     delay_samples = (SPAN * SPS)/2;
