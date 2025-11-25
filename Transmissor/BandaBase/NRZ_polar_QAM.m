@@ -7,9 +7,8 @@ function [t, I_coeffs, Q_coeffs, I_waveform, Q_waveform, padding_bits] = NRZ_pol
     end
     
     % --- 1. CONFIGURAÇÃO DE TEMPO E ORDEM ---
-    SPB = 15;                       % Amostras por Bit (Fixo para o sistema)
-    RB_TOTAL = 1411200;             % Taxa de Bits Total (1.4112 Mbps)
-    FS_SIM = RB_TOTAL * SPB;        % Frequência de Simulação (~21.168 MHz)
+    SPB = 200;                       % Amostras por Bit (Fixo para o sistema)
+    FS_SIM = 2000000;                % Frequencia de simulação
     
     M = N^2;                        % Ordem da Modulação (16, 64, ou 256)
     k = log2(M);                    % Bits por Símbolo (4, 6, ou 8) <-- Variável correta para reshape

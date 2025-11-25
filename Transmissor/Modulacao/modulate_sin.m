@@ -3,9 +3,8 @@ function modulated = modulate_sin(mod_wave, t, Fc)
 arguments (Input)
     mod_wave
     t
-    Fc = 2e6
+    Fc = 100e3
 end
-   
     carrier = -sin(2*pi*Fc*t);
     modulated = mod_wave .* carrier;
 end

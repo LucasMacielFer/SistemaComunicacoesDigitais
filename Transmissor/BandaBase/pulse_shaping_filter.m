@@ -6,7 +6,7 @@ arguments (Input)
     N {mustBeMember(N, [1, 4, 8, 16])}  % Coeficiente NRZ
 end
     % --- 1. PARÂMETROS FIXOS DO SISTEMA ---
-    SPB = 15;        % Amostras por Bit (Fixo)
+    SPB = 200;       % Amostras por Bit (Fixo)
     ALPHA = 0.25;    % Fator de Roll-off (Padrão)
     SPAN = 10;       % Duração do filtro em símbolos (Padrão)
     
@@ -23,7 +23,7 @@ end
     h_rrc = rcosdesign(ALPHA, SPAN, SPS, 'sqrt');
 
     sinal_filtrado = upfirdn(symbols, h_rrc, SPS, 1);
-    delay_samples = (SPAN * SPS) / 2;
+    delay_samples = (SPAN * SPS)/2;
 
     L_input_syms = size(symbols, 2); % Número de símbolos no input
     L_target_samples = L_input_syms * SPS;     % Comprimento total desejado

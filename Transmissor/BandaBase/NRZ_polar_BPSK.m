@@ -16,10 +16,10 @@ end
     
     % Assim, a frequência da simulação será correspondente ao débito
     % binário no pior caso, multiplicado pelo número de amostras por bit
-    spb = 15;
+    spb = 200;
     sz = size(data);
 
-    FS_SIM = 1411200 * spb;
+    FS_SIM = 2000000;
     Len_total = spb*sz(2);
     
     I_waveform = zeros(sz(1), Len_total);
