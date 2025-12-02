@@ -24,7 +24,7 @@ end
     h_rrc = h_rrc / sum(h_rrc);
 
     sinal_filtrado = upfirdn(symbols, h_rrc, SPS, 1);
-    delay_samples = (SPAN * SPS)/2;
+    delay_samples = (SPAN * SPS)/2 + 1;
 
     L_input_syms = size(symbols, 2); % Número de símbolos no input
     L_target_samples = L_input_syms * SPS;     % Comprimento total desejado

@@ -1,11 +1,11 @@
-addpath 'C:\Users\lucas\OneDrive\Documents\MATLAB\CD\TRABALHO\Transmissor'
-addpath 'C:\Users\lucas\OneDrive\Documents\MATLAB\CD\TRABALHO\Transmissor\FonteDeDados'
-addpath 'C:\Users\lucas\OneDrive\Documents\MATLAB\CD\TRABALHO\Transmissor\BandaBase'
-addpath 'C:\Users\lucas\OneDrive\Documents\MATLAB\CD\TRABALHO\Transmissor\Modulacao'
-addpath 'C:\Users\lucas\OneDrive\Documents\MATLAB\CD\TRABALHO\Receptor'
-addpath 'C:\Users\lucas\OneDrive\Documents\MATLAB\CD\TRABALHO\Receptor\Demodulacao'
-addpath 'C:\Users\lucas\OneDrive\Documents\MATLAB\CD\TRABALHO\Receptor\BandaBase'
-addpath 'C:\Users\lucas\OneDrive\Documents\MATLAB\CD\TRABALHO\Receptor\Reconstrucao'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Transmissor'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Transmissor\FonteDeDados'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Transmissor\BandaBase'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Transmissor\Modulacao'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\Demodulacao'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\BandaBase'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\Reconstrucao'
 
 TXBinData = [];
 symbols = [];
@@ -13,13 +13,14 @@ symbols = [];
 [lins, cols] = size(TXBinData);
 
 % Pipeline envio - canal - recepção
+erroTotal = 0;
 if(~isempty(TXBinData))
     for i=1:lins
         [t, TXWave] = TX(TXBinData(i,:), N_levels, pulse, conv, g1, g2);
         disp("Linha " + i + " enviada...");
         [RXBinData, symbols_temp] = RX(t, TXWave, N_levels, pulse, conv, g1, g2);
-        error = sum(abs(RXBinData-TXBinData));
-        disp("Erro na linha " + i + " = " + error);
+        RXBinData = RXBinData(1:length(TXBinData));
+        erroTotal = erroTotal + sum(abs(RXBinData-TXBinData(i,:)));
         symbols = [symbols symbols_temp];
     end
 end
