@@ -62,11 +62,11 @@ function [t, I_coeffs, Q_coeffs, I_waveform, Q_waveform, padding_bits] = NRZ_pol
     % --- 4. GERAÇÃO DA ONDA QUADRADA ---
     SPS = SPB * k; % Amostras por Símbolo = 15 * k
     
-    I_coeffs = real(simbolos_I_Q);
-    Q_coeffs = imag(simbolos_I_Q);
+    I_coeffs = real(simbolos_I_Q)/(N-1);
+    Q_coeffs = imag(simbolos_I_Q)/(N-1);
 
-    I_waveform = repelem(real(simbolos_I_Q), 1, SPS);
-    Q_waveform = repelem(imag(simbolos_I_Q), 1, SPS);
+    I_waveform = repelem(real(simbolos_I_Q), 1, SPS)/(N-1);
+    Q_waveform = repelem(imag(simbolos_I_Q), 1, SPS)/(N-1);
     
     len_total = size(I_waveform, 2);
     T_total = (len_total - 1) / FS_SIM;
