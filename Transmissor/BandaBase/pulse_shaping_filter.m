@@ -12,6 +12,7 @@ end
     
     switch N
             case 1,  k = 1; % BPSK
+            case 2,  k = 2; % QPSK
             case 4,  k = 4; % 16-QAM
             case 8,  k = 6; % 64-QAM (log2(64)=6)
             case 16, k = 8; % 256-QAM (log2(256)=8)
@@ -21,7 +22,7 @@ end
     SPS = SPB * k;
 
     h_rrc = rcosdesign(ALPHA, SPAN, SPS, 'sqrt');
-    h_rrc = h_rrc / sum(h_rrc);
+    h_rrc = h_rrc / sqrt(sum(h_rrc.^2));
 
     sinal_filtrado = upfirdn(symbols, h_rrc, SPS, 1);
     delay_samples = (SPAN * SPS)/2 + 1;

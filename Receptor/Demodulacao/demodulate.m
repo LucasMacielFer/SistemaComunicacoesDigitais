@@ -2,7 +2,7 @@ function [symbols] = demodulate(wave, t, N_levels, filtered, Fc)
 arguments(Input)
     wave 
     t
-    N_levels {mustBeMember(N_levels, [1, 4, 8, 16])}
+    N_levels {mustBeMember(N_levels, [2, 4, 8, 16])}
     filtered
     Fc = 100e3
 end
@@ -16,31 +16,31 @@ end
 
     switch N_levels
             case 1,  k = 1; % BPSK
+            case 2, k = 2;
             case 4,  k = 4; % 16-QAM
             case 8,  k = 6; % 64-QAM (log2(64)=6)
             case 16, k = 8; % 256-QAM (log2(256)=8)
             otherwise, error('Nível de modulação não suportado.');
     end
 
-    spb = 200; % Samples per symbol
-    step_size = spb*k;
+    SPB = 200; % Samples per symbol
+    SPS = SPB*k;
+    SPAN = 10;
+    ALPHA = 0.25;
 
     if filtered
-        h_rrc = rcosdesign(0.25, 10, spb*k, 'sqrt');
-        h_rrc = h_rrc / sum(h_rrc);
-        I_base = conv(wave_I, h_rrc);
-        Q_base = conv(wave_Q, h_rrc);
+        h_rrc = rcosdesign(ALPHA, SPAN, SPS, 'sqrt');
+        h_rrc = h_rrc / sqrt(sum(h_rrc.^2));
+        I_base = upfirdn(wave_I, h_rrc, 1, 1);
+        Q_base = upfirdn(wave_Q, h_rrc, 1, 1);
 
-        % 10 é o SPAN do filtro. Não é um valor mágico
-        delay = (10*k*spb)/2;
-        
-        idx_amostragem = delay : step_size : length(I_base);
-        idx_amostragem = idx_amostragem(idx_amostragem <= length(I_base));
-        plot(I_base);
-        
-        return;
-        I_final = I_base(idx_amostragem);
-        Q_final = Q_base(idx_amostragem);
+        delay_samples = (SPS*SPAN)/2;
+        num_symbols = floor((length(I_base) - delay_samples) / SPS);
+        idx0 = delay_samples;
+        idx = idx0 : SPS : idx0 + (num_symbols-1)*SPS;
+
+        I_final = I_base(idx);
+        Q_final = Q_base(idx);
     else
         fs = 2e6; 
         f_cut = 20e3; 
@@ -50,26 +50,17 @@ end
         Q_lpf = filtfilt(b, a, wave_Q);
         
         start_idx = 1;
-        idx_amostragem = step_size : step_size : length(I_lpf);
+        idx_amostragem = SPS : SPS : length(I_lpf);
 
         num_symbols = length(idx_amostragem);
         I_final = zeros(1, num_symbols);
         Q_final = zeros(1, num_symbols);
 
         for i=1:length(idx_amostragem)
-            I_final(1,i) = trapz(I_lpf(start_idx:idx_amostragem(i)))/step_size;
-            Q_final(1,i) = trapz(Q_lpf(start_idx:idx_amostragem(i)))/step_size;
+            I_final(1,i) = trapz(I_lpf(start_idx:idx_amostragem(i)))/SPS;
+            Q_final(1,i) = trapz(Q_lpf(start_idx:idx_amostragem(i)))/SPS;
             start_idx = idx_amostragem(i)+1;
         end
-    end
-
-    %P_rms = sqrt(mean(I_final.^2 + Q_final.^2));
-    max_val = max(max(abs(I_final)), max(abs(Q_final)));
-
-    scale_factor = max_val; 
-    if scale_factor > 0
-        I_final = I_final / scale_factor;
-        Q_final = Q_final / scale_factor;
     end
 
     % Está pronta a constelação...

@@ -3,7 +3,7 @@ function [t, I_coeffs, Q_coeffs, I_waveform, Q_waveform, padding_bits] = NRZ_pol
     % com as portadoras I e Q
     arguments (Input)
         data    (1,:) double
-        N       {mustBeMember(N, [4, 8, 16])}   % Coeficiente NRZ
+        N       {mustBeMember(N, [2, 4, 8, 16])}   % Coeficiente NRZ
     end
     
     % --- 1. CONFIGURAÇÃO DE TEMPO E ORDEM ---
@@ -61,12 +61,17 @@ function [t, I_coeffs, Q_coeffs, I_waveform, Q_waveform, padding_bits] = NRZ_pol
     
     % --- 4. GERAÇÃO DA ONDA QUADRADA ---
     SPS = SPB * k; % Amostras por Símbolo = 15 * k
-    
-    I_coeffs = real(simbolos_I_Q)/(N-1);
-    Q_coeffs = imag(simbolos_I_Q)/(N-1);
+    Es = (2/3) * (N^2 - 1);        
+    norm_factor = sqrt(1 / double(Es));
 
-    I_waveform = repelem(real(simbolos_I_Q), 1, SPS)/(N-1);
-    Q_waveform = repelem(imag(simbolos_I_Q), 1, SPS)/(N-1);
+    I_norm = real(simbolos_I_Q)*norm_factor;
+    Q_norm = imag(simbolos_I_Q)*norm_factor;
+
+    I_coeffs = I_norm;
+    Q_coeffs = Q_norm;
+    
+    I_waveform = repelem(I_norm, 1, SPS);
+    Q_waveform = repelem(Q_norm, 1, SPS);
     
     len_total = size(I_waveform, 2);
     T_total = (len_total - 1) / FS_SIM;

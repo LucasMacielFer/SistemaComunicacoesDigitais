@@ -23,6 +23,13 @@ end
                 [wave_I, ~, ~] = pulse_shaping_filter(coeffs_I, 1);
             end
             wave = modulate_cos(wave_I, tempo);
+        case 2
+            [tempo, coeffs_I, coeffs_Q, wave_I, wave_Q] = NRZ_polar_QAM(bin_data, 2);
+            if pulse
+                [wave_I, ~, ~] = pulse_shaping_filter(coeffs_I, 2);
+                [wave_Q, ~, ~] = pulse_shaping_filter(coeffs_Q, 2);
+            end
+            wave = modulate_cos(wave_I, tempo) + modulate_sin(wave_Q, tempo);
         case 4
             [tempo, coeffs_I, coeffs_Q, wave_I, wave_Q] = NRZ_polar_QAM(bin_data, 4);
             if pulse

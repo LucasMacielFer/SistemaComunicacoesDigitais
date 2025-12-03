@@ -4,19 +4,30 @@ function bits = demapper(symbols_hat, N_levels)
 % Retorna bits como vetor linha
 %
 % Exemplo: 64-QAM -> N_levels=8, k=3 bits por eixo
-
+arguments(Input)
+    symbols_hat 
+    N_levels {mustBeMember(N_levels, [2, 4, 8, 16])}
+end   
     switch N_levels
         case 1,  k = 1; % BPSK
+        case 2,  k = 1; % QPSK
         case 4,  k = 2; % 16-QAM
         case 8,  k = 3; % 64-QAM
         case 16, k = 4; % 256-QAM
-        otherwise, error('Nível de modulação não suportado.');
     end
 
-    bits = [];
+    num_symbols = length(symbols_hat);
+    bits = zeros(1, num_symbols * 2 * k);
 
-    % Criar níveis uniformes [-1, 1] por eixo
-    levels = linspace(-1, 1, N_levels);
+    % Normalização por energia média do símbolo
+    integers = -(double(N_levels-1)) : 2 : (double(N_levels-1));
+    disp(integers)
+    M = N_levels^2;
+    Es = (2/3) * (M - 1); 
+    norm_factor = sqrt(1 / double(Es));
+    levels = integers * norm_factor;
+
+    idx_fill = 1;
 
     for i = 1:length(symbols_hat)
         % Separar I e Q
@@ -43,7 +54,8 @@ function bits = demapper(symbols_hat, N_levels)
             Q_bin(b) = bitget(idx_Q, k-b+1) ~= Q_bin(b-1);
         end
 
-        % Concatenar bits I e Q
-        bits = [bits, I_bin, Q_bin];
+        bits(idx_fill : idx_fill + k - 1) = I_bin;
+        bits(idx_fill + k : idx_fill + 2*k - 1) = Q_bin;
+        idx_fill = idx_fill + 2*k;
     end
 end
