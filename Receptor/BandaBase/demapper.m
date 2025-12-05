@@ -1,5 +1,5 @@
 function bits = demapper(symbols_hat, N_levels)
-% symbols_hat: vetor de símbolos complexos normalizados [-1,1]
+% symbols_hat: vetor de símbolos complexos normalizados por energia média
 % N_levels: níveis por eixo (sqrt da constelação)
 % Retorna bits como vetor linha
 %
@@ -21,7 +21,6 @@ end
 
     % Normalização por energia média do símbolo
     integers = -(double(N_levels-1)) : 2 : (double(N_levels-1));
-    disp(integers)
     M = N_levels^2;
     Es = (2/3) * (M - 1); 
     norm_factor = sqrt(1 / double(Es));

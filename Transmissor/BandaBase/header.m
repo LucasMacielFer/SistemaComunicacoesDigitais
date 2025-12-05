@@ -1,16 +1,38 @@
-function [outputArg1,outputArg2] = header(N_levels)
-%HEADER_APPEND Summary of this function goes here
-%   Detailed explanation goes here
-arguments (Input)
-    inputArg1
-    inputArg2
-end
-
-arguments (Output)
-    outputArg1
-    outputArg2
-end
-
-outputArg1 = inputArg1;
-outputArg2 = inputArg2;
+function [header_bits, pcw_len_symbols] = header(N_levels)
+    % Função que gera o cabeçalho completo (Hadamard + PCW)
+    
+    % --- 1. CONFIGURAÇÃO BASE ---
+    if N_levels == 1
+        M = 2;
+    else
+        M = N_levels^2;
+    end
+    bits_per_sym = log2(M); 
+    
+    % --- 2. GERAÇÃO DO TREINO (Hadamard 256) ---
+    Seq_Len_Hadamard = 64; % Em símbolos
+    H = hadamard(Seq_Len_Hadamard);
+    
+    % Usamos a linha 64 para treino (boa variação espectral)
+    seq_bipolar = H(64, :)'; 
+    seq_logical = (seq_bipolar > 0); 
+    
+    % Expansão e Linearização do Hadamard para Bits (Corner/Extremes)
+    bits_matrix_hadamard = repmat(seq_logical, 1, bits_per_sym);
+    hadamard_bits = bits_matrix_hadamard(:).';
+    
+    % --- 3. GERAÇÃO DA PALAVRA DE VERIFICAÇÃO DE FASE (PCW) ---
+    
+    % O PCW deve ser curto, de alta energia e fácil de identificar.
+    pcw_len_symbols = 8; % Tamanho fixo em 8 símbolos (Ex: 64 bits em 256-QAM)
+    
+    % Geramos 8 bits, todos '1's (Isso força o símbolo a ir para o canto +++)
+    pcw_base_bit = true(1, pcw_len_symbols); % [1 1 1 1 1 1 1 1]
+    
+    % Repete cada bit para preencher o símbolo inteiro (robustez)
+    pcw_bits_matrix = repmat(pcw_base_bit, bits_per_sym, 1);
+    pcw_bits = pcw_bits_matrix(:).';
+    
+    % --- 4. CONCATENAÇÃO FINAL ---
+    header_bits = [hadamard_bits, pcw_bits];
 end

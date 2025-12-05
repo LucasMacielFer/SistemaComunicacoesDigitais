@@ -6,6 +6,10 @@ addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Recep
 addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\Demodulacao'
 addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\BandaBase'
 addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\Reconstrucao'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\Equalizacao'
+addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Canal'
+
+
 
 TXBinData = [];
 symbols = [];
