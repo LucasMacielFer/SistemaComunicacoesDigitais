@@ -4,9 +4,9 @@ N_levels = 4;
 
 % Parametros ruido
 SNR = 100;
-Perfil_MP = 0;
+Perfil_MP = 4;
 Ruido_fase = 0;
-Desv_doppler = 0;
+Desv_doppler = 0.1;
 
 % Parametros equalizador - BPSK
 % fwd_taps = 1;
@@ -23,18 +23,18 @@ Desv_doppler = 0;
 % damping = 0.7;
 
 % Parametros equalizador - QAM
-% fwd_taps = 21;
-% ref_tap = 19;
-% forgetting_f = 0.999999;
-% loop_bw = 0.005;
-% damping = 1.0;
+fwd_taps = 15;
+ref_tap = 11;
+forgetting_f = 0.9999;
+loop_bw = 0.01;
+damping = 1;
 
 % Transmissor
 nbits = 10000;
 data = randi([0 1], 1, nbits);
 [h, ~] = header(N_levels);
 bits_tx = [h data];
-hsz = length(h)
+hsz = length(h);
 if N_levels == 1
     [t, I_coeffs, I_wave] = NRZ_polar_BPSK(bits_tx);
     if Desv_doppler == 0 && Ruido_fase == 0
@@ -75,16 +75,16 @@ if N_levels == 1
     bits_eq = slicer_demapper_BPSK(symbols_norm);
     bits_eq2 = slicer_demapper_BPSK(symbols_lin);
 
-else
-    symbols_norm = single_carrier_equalize(symbols, N_levels, fwd_taps, fb_taps, ref_tap, forgetting_f, loop_bw);
-    symbols_norm = normalize(symbols_norm);
-    
+else  
     symbols_lin = single_carrier_eq_no_dfe(symbols, N_levels, fwd_taps, ref_tap, forgetting_f, loop_bw, damping);
     symbols_lin = normalize(symbols_lin);
 
+    symbols_LMS =  simple_phase_corrector(symbols, N_levels);
+    symbols_LMS = normalize(symbols_LMS);
+
     sliced_rx = slicer(symbols, N_levels);
-    sliced_eq = slicer(symbols_norm, N_levels);
-    sliced_eq2 = slicer(symbols_lin, N_levels);
+    sliced_eq = slicer(symbols_lin, N_levels);
+    sliced_eq2 = slicer(symbols_LMS, N_levels);
     bits_rx = demapper(sliced_rx, N_levels);
     bits_eq = demapper(sliced_eq, N_levels);
     bits_eq2 = demapper(sliced_eq2, N_levels);
@@ -170,7 +170,7 @@ axis equal;
 scatter(levels_I, levels_Q, 'r', 'x', 'LineWidth',1);
 
 subplot(1,3,2)
-scatter(real(symbols_norm(257:end)), imag(symbols_norm(257:end)), 'filled');
+scatter(real(symbols_lin(257:end)), imag(symbols_lin(257:end)), 'filled');
 hold on;
 grid on;
 title('Diagrama de Constelação Equalizado');    
@@ -180,7 +180,7 @@ axis equal;
 scatter(levels_I, levels_Q, 'r', 'x', 'LineWidth',1);
 
 subplot(1,3,3)
-scatter(real(symbols_lin(257:end)), imag(symbols_lin(257:end)), 'filled');
+scatter(real(symbols_LMS(257:end)), imag(symbols_LMS(257:end)), 'filled');
 hold on;
 grid on;
 title('Diagrama de Constelação Equalizado 2');    
