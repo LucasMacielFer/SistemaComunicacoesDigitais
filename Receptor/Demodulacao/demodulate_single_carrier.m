@@ -15,7 +15,7 @@ end
 
     switch N_levels
             case 1,  k = 1; % BPSK
-            case 2, k = 2;  % QPSK
+            case 2,  k = 2;  % QPSK
             case 4,  k = 4; % 16-QAM
             case 8,  k = 6; % 64-QAM (log2(64)=6)
             case 16, k = 8; % 256-QAM (log2(256)=8)

@@ -9,7 +9,7 @@ function [header_bits, pcw_len_symbols] = header(N_levels)
     end
     bits_per_sym = log2(M); 
     
-    % --- 2. GERAÇÃO DO TREINO (Hadamard 256) ---
+    % --- 2. GERAÇÃO DO TREINO (Hadamard 64) ---
     Seq_Len_Hadamard = 64; % Em símbolos
     H = hadamard(Seq_Len_Hadamard);
     

@@ -28,7 +28,7 @@ sym_qam = I_coeffs + 1i*Q_coeffs;
 wave_I = modulate_cos(real(tx_signal), t, 400e3);
 wave_Q = modulate_sin(imag(tx_signal), t, 400e3);
 wave = wave_I + wave_Q;
-wave = canal(wave, t, 4, 20);
+wave = canal(wave, t, 3, 20);
 
 %% 4. RECEPTOR (RX) - MODULARIZADO
 fprintf('3. Demodulando...\n');

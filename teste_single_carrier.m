@@ -1,11 +1,11 @@
 Fs = 2e6;
 Fc = 100e3;
-N_levels = 4;
+N_levels = 1;
 
 % Parametros ruido
-SNR = 100;
+SNR = -10;
 Perfil_MP = 4;
-Ruido_fase = 0;
+Ruido_fase = 0.001;
 Desv_doppler = 0.1;
 
 % Parametros equalizador - BPSK
@@ -40,7 +40,7 @@ if N_levels == 1
     if Desv_doppler == 0 && Ruido_fase == 0
         wave = modulate_cos(I_wave, t);
     else
-        wave = modulate_dirty(I_wave, [], t, Ruido_fase, Desv_doppler);
+        wave = modulate_single_carrier(I_wave, [], t, Ruido_fase, Desv_doppler);
     end
 
     syms_original = I_coeffs;
@@ -52,7 +52,7 @@ else
     if Desv_doppler == 0 && Ruido_fase == 0
         wave = wave_I + wave_Q;
     else
-        wave = modulate_dirty(I_wave, Q_wave, t, Ruido_fase, Desv_doppler);
+        wave = modulate_single_carrier(I_wave, Q_wave, t, Ruido_fase, Desv_doppler);
     end
 
     syms_original = I_coeffs + 1i*Q_coeffs;
@@ -69,7 +69,7 @@ header_size = (64+8)*N_levels + 1;
 
 if N_levels == 1
     symbols_norm = BPSK_equalizer(symbols, fwd_taps, ref_tap, forgetting_f, loop_bw);
-    symbols_lin = symbols_norm;
+    symbols_lin = simple_phase_corrector(symbols, 1);
 
     bits_rx = slicer_demapper_BPSK(symbols);
     bits_eq = slicer_demapper_BPSK(symbols_norm);

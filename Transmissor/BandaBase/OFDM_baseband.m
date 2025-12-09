@@ -6,6 +6,10 @@ arguments(Input)
     Fs double = 2e6       % --- ADICIONADO: Frequência de amostragem padrão
 end   
     symbols_col = symbols(:);
+
+    if N_pilots_target > 0.7*N_carriers
+        N_pilots_target = floor(0.7*N_carriers);
+    end
     
     % --- MODIFICADO: Definição do tamanho da FFT de simulação ---
     N_fft_sim = N_carriers * 8; 

@@ -4,7 +4,7 @@ function [clean_symbols_rotated] = BPSK_equalizer(rx_signal, fwd_taps, ref_tap, 
     
     % --- 0. CONFIGURAÇÕES INICIAIS ---
     PCW_LEN_SYMBOLS = 8; 
-    Fs = 1e6; 
+    Fs = 2e6; 
     Ts = 1/Fs;
     
     M = 2;

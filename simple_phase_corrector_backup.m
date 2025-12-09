@@ -1,4 +1,4 @@
-function [clean_symbols_rotated] = simple_phase_corrector(rx_signal, N_levels)
+function [clean_symbols_rotated] = simple_phase_corrector_backup(rx_signal, N_levels)
     % SIMPLE_GEOMETRIC_PHASE_CORRECTOR: Corrige a fase apenas por média geométrica.
     % Não utiliza CFO, Regressão, Unwrap, PLL, nem Equalizador.
     

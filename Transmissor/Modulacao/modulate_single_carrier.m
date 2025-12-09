@@ -1,4 +1,4 @@
-function [tx_rf, t] = modulate_dirty(wave_I, wave_Q, t, phase_std, doppler_freq, Fc)
+function [tx_rf, t] = modulate_single_carrier(wave_I, wave_Q, t, phase_std, doppler_freq, Fc)
 % Modulação do sinal em banda-base com desvio de fase e ruido doppler
 arguments (Input)
     wave_I

@@ -1,4 +1,4 @@
-function data = audio_encoder(filename, time)
+function data = audio_encoder(filename, time, Fs)
 % Função responsável por gerar a sequência de bits referente a um sinal de
 % áudio. O sinal será recuperado de um arquivo de áudio no caminho 
 % "filename".
@@ -8,11 +8,12 @@ function data = audio_encoder(filename, time)
 % amplitudes convertidas para binário.
 arguments (Input)
     filename (1,:) char
-    time (1,1) double
+    time (1,1) uint16
+    Fs (1,1) uint16
 end
     % nSamplesPerRow: 44100 Hz * 0,02 s = 882 amostras
     % nFrames: time/0,02 = time*50 = numero de blocos de 20 ms
-    nSamplesPerRow = 882;
+    nSamplesPerRow = Fs * 0.02;
     nFrames = 50*time;
 
     [audioData, ~] = audioread(filename); 
