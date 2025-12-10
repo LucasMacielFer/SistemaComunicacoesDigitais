@@ -1,12 +1,12 @@
 Fs = 2e6;
 Fc = 100e3;
-N_levels = 1;
+N_levels = 16;
 
 % Parametros ruido
-SNR = -10;
-Perfil_MP = 4;
-Ruido_fase = 0.001;
-Desv_doppler = 0.1;
+SNR = 100;
+Perfil_MP = 0;
+Ruido_fase = 0.000;
+Desv_doppler = 0.0;
 
 % Parametros equalizador - BPSK
 % fwd_taps = 1;
@@ -30,7 +30,7 @@ loop_bw = 0.01;
 damping = 1;
 
 % Transmissor
-nbits = 10000;
+nbits = 100000;
 data = randi([0 1], 1, nbits);
 [h, ~] = header(N_levels);
 bits_tx = [h data];
@@ -59,11 +59,11 @@ else
 end
 
 % Canal
-wave = canal(wave, t, Perfil_MP, SNR);
+wave = canal(wave, t, Perfil_MP, SNR, N_levels);
 
 % Receptor
 symbols = demodulate_single_carrier(wave, t, N_levels);
-symbols = normalize(symbols);
+%symbols = normalize(symbols);
 
 header_size = (64+8)*N_levels + 1;
 
@@ -90,22 +90,22 @@ else
     bits_eq2 = demapper(sliced_eq2, N_levels);
 end
 
-bits_rx = logical(bits_rx(header_size:end));
-bits_eq = logical(bits_eq(header_size:end));
-bits_eq2 = logical(bits_eq2(header_size:end));
-data = logical(data);
-
-err_rx = xor(bits_rx, data);
-err_eq = xor(bits_eq, data);
-err_eq2 = xor(bits_eq2, data);
-
-ber_rx = sum(err_rx)/nbits;
-ber_eq = sum(err_eq)/nbits;
-ber_eq2 = sum(err_eq2)/nbits;
-
-disp(ber_rx);
-disp(ber_eq);
-disp(ber_eq2);
+% bits_rx = logical(bits_rx(header_size:end));
+% bits_eq = logical(bits_eq(header_size:end));
+% bits_eq2 = logical(bits_eq2(header_size:end));
+% data = logical(data);
+% 
+% err_rx = xor(bits_rx, data);
+% err_eq = xor(bits_eq, data);
+% err_eq2 = xor(bits_eq2, data);
+% 
+% ber_rx = sum(err_rx)/nbits;
+% ber_eq = sum(err_eq)/nbits;
+% ber_eq2 = sum(err_eq2)/nbits;
+% 
+% disp(ber_rx);
+% disp(ber_eq);
+% disp(ber_eq2);
 
 % [ber_I, ber_Q, ~] = check_bit_ambiguity(symbols_norm, data, N_levels^2);
 % disp(ber_I);
