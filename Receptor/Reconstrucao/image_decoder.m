@@ -76,6 +76,7 @@ end
     % rot90(A, -1) = rotação de 90 graus no sentido horário (para a direita).
     
     img_recovered = rot90(img_reconstruida, -1);
+    img_recovered = flip(img_recovered, 2);
     my_path = which('image_decoder');
     [dir, ~, ~] = fileparts(my_path);
     path = fullfile(dir, 'tmpImg.jpg');

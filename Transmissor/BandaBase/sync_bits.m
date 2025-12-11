@@ -1,4 +1,4 @@
-function [header_bits, pcw_len_symbols] = mini_header(N_levels)
+function [header_bits, pcw_len_symbols] = sync_bits(N_levels)
 % Função que gera os símbolos pilotos (Hadamard + PCW)
 % 16+4 = 20 símbolos
 

@@ -17,6 +17,7 @@ end
     nFrames = 50*time;
 
     [audioData, ~] = audioread(filename); 
-    audioData = reshape(audioData, nSamplesPerRow, nFrames).';
+
+    audioData = int16(audioData * 2^15);
     data = reshape((dec2bin(audioData, 16) - '0').',16*nSamplesPerRow, []).';
 end
