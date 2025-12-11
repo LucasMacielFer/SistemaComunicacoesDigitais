@@ -1,12 +1,12 @@
 Fs = 2e6;
 Fc = 100e3;
-N_levels = 16;
+N_levels = 2;
 
 % Parametros ruido
 SNR = 100;
 Perfil_MP = 0;
-Ruido_fase = 0.000;
-Desv_doppler = 0.0;
+Ruido_fase = 0.001;
+Desv_doppler = 10;
 
 % Parametros equalizador - BPSK
 % fwd_taps = 1;
@@ -16,18 +16,18 @@ Desv_doppler = 0.0;
 % damping = 1.0;
 
 % Parametros equalizador - QPSK
-% fwd_taps = 11;
-% ref_tap = 9;
-% forgetting_f = 0.99;
-% loop_bw = 0.05;
-% damping = 0.7;
+fwd_taps = 11;
+ref_tap = 9;
+forgetting_f = 0.99;
+loop_bw = 0.05;
+damping = 0.7;
 
 % Parametros equalizador - QAM
-fwd_taps = 15;
-ref_tap = 11;
-forgetting_f = 0.9999;
-loop_bw = 0.01;
-damping = 1;
+% fwd_taps = 15;
+% ref_tap = 11;
+% forgetting_f = 0.9999;
+% loop_bw = 0.01;
+% damping = 1;
 
 % Transmissor
 nbits = 100000;

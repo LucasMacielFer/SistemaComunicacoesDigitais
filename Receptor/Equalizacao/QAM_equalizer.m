@@ -1,4 +1,4 @@
-function [clean_symbols_rotated] = simple_phase_corrector(rx_signal, N_levels)
+function [clean_symbols_rotated] = QAM_equalizer(rx_signal, N_levels)
     % SIMPLE_PHASE_CORRECTOR_PCW: Integra CFO (Regressão Linear) com Limiar de Ruído
     % e aplica uma Correção de Fase Estática (PCW) final.
     
@@ -80,6 +80,7 @@ function [clean_symbols_rotated] = simple_phase_corrector(rx_signal, N_levels)
     % e o gabarito.
     final_error_ratio = pcw_corrected_rx ./ training_seq_pcw;
     static_phase_error = angle(mean(final_error_ratio));
+    static_module_error = mean(abs(final_error_ratio));
     
     % C. Fator de Correção Estática (Rotaciona na direção OPPOSTA ao erro médio)
     static_correction_factor = exp(-1i * static_phase_error);
@@ -89,5 +90,5 @@ function [clean_symbols_rotated] = simple_phase_corrector(rx_signal, N_levels)
     
     % --- 5. RETORNO FINAL ---
     
-    clean_symbols_rotated = clean_symbols_rotated.';
+    clean_symbols_rotated = static_module_error*clean_symbols_rotated.';
 end

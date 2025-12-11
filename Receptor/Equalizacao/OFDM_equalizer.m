@@ -1,4 +1,4 @@
-function [eq_grid, ch_estimation] = OFDM_equalize(neq_grid, params)
+function [eq_grid, ch_estimation] = OFDM_equalizer(neq_grid, params)
 %OFDM_EQUALIZE Summary of this function goes here
 %   Detailed explanation goes here
 arguments (Input)

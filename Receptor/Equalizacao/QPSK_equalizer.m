@@ -1,4 +1,4 @@
-function [clean_symbols_rotated] = single_carrier_eq_no_dfe(rx_signal, N_levels, fwd_taps, ref_tap, forgetting_f, loop_bw, damping)
+function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps, ref_tap, forgetting_f, loop_bw, damping)
     % SINGLE_CARRIER_EQUALIZE: Versão Final Usando EQUALIZADOR LINEAR (LE).
     % Nota: O parâmetro 'fb_taps' é mantido na assinatura, mas ignorado.
     
@@ -14,7 +14,10 @@ function [clean_symbols_rotated] = single_carrier_eq_no_dfe(rx_signal, N_levels,
     end
     
     % Constelações e Sequências
-    ref_const = qammod(0:M-1, M, 'UnitAveragePower', true);
+    ref_bits = de2bi(0:M-1, 'left-msb');
+    ref_bits = ref_bits.';
+    ref_bits = ref_bits(:).';
+    ref_const = create_qam_symbols(ref_bits, N_levels);
     [header_bits, ~] = header(N_levels);
     training_seq = create_qam_symbols(header_bits, N_levels);
     
@@ -133,7 +136,7 @@ function [clean_symbols_rotated] = single_carrier_eq_no_dfe(rx_signal, N_levels,
     final_real = real(clean_symbols_temp) .* (-1).^correction_factor_I;
     final_imag = imag(clean_symbols_temp) .* (-1).^correction_factor_Q;
     
-    clean_symbols_rotated = final_real + 1j * final_imag;
+    clean_symbols_rotated = final_imag + 1j * final_real;
     
     % --- 4. RETORNO ---
     clean_symbols_rotated = clean_symbols_rotated.';
