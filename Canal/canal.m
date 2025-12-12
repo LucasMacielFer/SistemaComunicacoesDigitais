@@ -1,4 +1,4 @@
-function rx_wave = canal(tx_wave, t, perfil, snr, N_levels)
+function rx_wave = canal(tx_wave, t, perfil, snr, N_levels, conv)
 % Função que aplica as imperfeições do canal: Multipath e AWGN
 arguments (Input)
     tx_wave
@@ -6,6 +6,7 @@ arguments (Input)
     perfil {mustBeMember(perfil, [0, 1, 2, 3, 4])}  % Perfil multipercurso
     snr                                             % SNR AWGN
     N_levels
+    conv 
 end
 
 % --- 1. LABORATÓRIO "COM DEFEITO" (Otimista, mas realista) ---
@@ -44,11 +45,11 @@ end
         k = 1;
     end
 
+    if conv, Rc = 2; else Rc = 1; end
+
     spb = 200;
-    P_rx_ref = mean(abs(rx_wave).^2);
-
-    OSR = spb*k;
-    OSR_dB = 10 * log10(OSR);
-
-    rx_wave = awgn(rx_wave, snr-OSR_dB, P_rx_ref, OSR);
+    OSR = spb;
+    OSR_dB = 10 * log10(OSR) - 10 * log10(Rc);
+    
+    rx_wave = awgn(rx_wave, snr-OSR_dB, 'measured');
 end

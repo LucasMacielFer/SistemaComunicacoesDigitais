@@ -1,4 +1,4 @@
-function [output] = conv_encoder(binseq, g1, g2)
+function [output] = conv_encoder_legado(binseq, g1, g2)
 % Função utilizada para aplicar a codificação convolucional aos dados
 % binários.
     arguments

@@ -1,4 +1,4 @@
-function [decoded_bit_seq] = viterbi(encoded_bit_seq, g1, g2)
+function [decoded_bit_seq] = viterbi_legado(encoded_bit_seq, g1, g2)
     arguments (Input)
         encoded_bit_seq (1,:) {mustBeNumeric, mustBeMember(encoded_bit_seq, [0, 1])}
         g1 (1,:) char
