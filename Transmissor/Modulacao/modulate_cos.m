@@ -1,5 +1,6 @@
 function modulated = modulate_cos(mod_wave, t, Fc)
-% Função para multiplicar o sinal modulante com a portadora (cos) de 2MHz
+% Uso Geral: Modula um sinal em banda-base (mod_wave) usando uma portadora cossenoidal 
+% com frequência Fc.
 arguments (Input)
     mod_wave
     t

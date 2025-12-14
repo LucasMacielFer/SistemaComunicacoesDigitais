@@ -1,4 +1,8 @@
 function [symbols_tx, symbols_rx, symbols_eq, bindata_rx, bindata_eq] = simulate_BPSK(bindata_tx, convActive, phase, doppler, multipath, snr)
+% Uso geral: Executar todo o pipeline de simulação para transmissão com
+% modulação BPSK em single carrier. Há uma função semelhante dentro da
+% aplicação final, que utiliza os parâmetros da classe. O funcionamento é
+% exatamente o mesmo.
 
     dataSize = size(bindata_tx);
     spb = 200;

@@ -1,9 +1,5 @@
 function bits = demapper(symbols_hat, N_levels)
-% symbols_hat: vetor de símbolos complexos normalizados por energia média
-% N_levels: níveis por eixo (sqrt da constelação)
-% Retorna bits como vetor linha
-%
-% Exemplo: 64-QAM -> N_levels=8, k=3 bits por eixo
+% Uso geral: Decodificar os símbolos QAM recebidos para bits.
 arguments(Input)
     symbols_hat 
     N_levels {mustBeMember(N_levels, [2, 4, 8, 16])}

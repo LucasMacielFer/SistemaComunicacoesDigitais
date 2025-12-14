@@ -1,4 +1,8 @@
 function [symbols_tx, symbols_rx, symbols_eq, bindata_rx, bindata_eq] = simulate_QAM(bindata_tx, N_levels, convActive, phase, doppler, multipath, snr)
+% Uso geral: Executar todo o pipeline de simulação para transmissão com
+% modulação QAM em single carrier. Há uma função semelhante dentro da
+% aplicação final, que utiliza os parâmetros da classe. O funcionamento é
+% exatamente o mesmo.
     
     k = 2*log2(N_levels); 
 

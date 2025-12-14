@@ -1,6 +1,8 @@
 function [output] = conv_encoder_legado(binseq, g1, g2)
-% Função utilizada para aplicar a codificação convolucional aos dados
-% binários.
+% Uso geral: Codificar os bits com código convolucional para adicionar
+% robustez ao sistema. Esta versão foi feita por mim. Deixei-a aqui como
+% código legado, pois agora utilizo a função nativa do MATLAB para maior
+% robustez
     arguments
         binseq (1,:) {mustBeNumeric, mustBeMember(binseq, [0, 1])}
         g1 (1,:) char = '11011'
@@ -8,25 +10,24 @@ function [output] = conv_encoder_legado(binseq, g1, g2)
     end
 
     if ~isequal(size(g2, 2), size(g1, 2))
-        output = []; 
         error('Os geradores g1 e g2 devem ter o mesmo comprimento.');
     end
     
     g1 = g1 - '0';
     g2 = g2 - '0';
     
-    % --- Parâmetros ---
     [num_seqs, seq_len] = size(binseq);
     memo_size = size(g1, 2) - 1;
     
-    % --- Pré-alocação de Memória ---
+    % Pré-alocação de Memória
     output_len = (seq_len + memo_size) * 2;
-    output = zeros(num_seqs, output_len); % Cria a matriz final de ZEROS
+    output = zeros(num_seqs, output_len);
     
     % Seletores lógicos
     g1_taps = logical(g1(2:end));
     g2_taps = logical(g2(2:end));
 
+    % Memo state refere-se ao estado de cada flip-flop
     memo_state = zeros(1, memo_size);
     idx = 1;
     for i = 1:seq_len
@@ -50,7 +51,7 @@ function [output] = conv_encoder_legado(binseq, g1, g2)
         memo_state = [current_bit, memo_state(1:memo_size-1)];
     end
     
-    % --- Loop de Flushing (Terminação) ---
+    % Loop de Flushing (Terminação - zerar os FFs)
     for i = 1:memo_size
         operand1 = memo_state(g1_taps);
         operand2 = memo_state(g2_taps);

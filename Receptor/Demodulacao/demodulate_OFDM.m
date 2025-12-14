@@ -1,30 +1,24 @@
 function rx_bb = demodulate_OFDM(rx_signal, t, Fc)
-% DEMODULATE_OFDM Converte sinal Passa-Banda para Banda Base Complexa.
-% O sinal de saída deve ser alimentado ao 'OFDM_prepare_grid'.
+% Uso geral: Demodulação de um sinal transmitido em OFDM para banda-base
+% complexa.
 arguments (Input)
-    rx_signal       % Sinal real (Passa-Banda) vindo do canal
-    t               % Vetor de tempo
-    Fc = 400e3      % Frequência da portadora (Default: 400kHz)
+    rx_signal       
+    t               
+    Fc = 400e3     
 end
 
-    % 1. Garantir vetores coluna
     rx_signal = rx_signal(:);
     t = t(:);
 
-    % 2. Descobrir a Taxa de Amostragem (Fs)
-    % Necessário para projetar o filtro corretamente
-    % Fs = 2e6;
     dt = t(2) - t(1);
     Fs = 1 / dt;
 
-    % 3. Mistura IQ (Downconversion)
-    % Multiplicamos por cos e -sin para separar I e Q
+    % Mistura IQ (Downconversion)
     rx_I_mix = rx_signal .* cos(2 * pi * Fc * t);
     rx_Q_mix = rx_signal .* -sin(2 * pi * Fc * t);
 
-    % 4. Filtragem Passa-Baixas (Low Pass Filter)
+    % Filtragem Passa-Baixas (Low Pass Filter)
     % Precisamos remover a imagem espectral que aparece em 2*Fc.
-    % Vamos cortar em Fc (assumindo que o sinal OFDM é mais estreito que a portadora).
     
     f_cut = Fc; % Frequência de corte
     
@@ -36,7 +30,7 @@ end
         Wn = 0.99; 
     end
     
-    % Filtro Butterworth de 5ª ordem (padrão robusto)
+    % Filtro Butterworth de 5ª ordem
     [b, a] = butter(5, Wn);
     
     % Aplicamos filtfilt para não ter atraso de fase (Zero-Phase Filtering)

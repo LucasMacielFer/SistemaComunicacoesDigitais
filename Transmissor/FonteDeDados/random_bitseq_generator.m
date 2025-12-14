@@ -1,5 +1,5 @@
 function [data] = random_bitseq_generator(nLinhas, nBits)
-% Função utilizada para gerar uma sequência aleatória com comprimento nBits
+% Uso Geral: Gera uma matriz aleatória de bits com dimensão nLinhas x nBits
 arguments (Input)
     nLinhas (1,1) uint32
     nBits (1,1) uint32

@@ -1,8 +1,11 @@
 function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps, ref_tap, forgetting_f, loop_bw, damping)
-    % SINGLE_CARRIER_EQUALIZE: Versão Final Usando EQUALIZADOR LINEAR (LE).
-    % Nota: O parâmetro 'fb_taps' é mantido na assinatura, mas ignorado.
+% Uso geral: Esta função equaliza exclusivamente QPSK. Testei com outras
+% modulações e não funcionou. Ainda assim, é melhor utilizar o equalizador
+% manual, que fiz "na unha" para o QPSK. Estou a usar esta somente para
+% demonstrar o funcionamento do equalizador linear da toolbox de
+% comunicações. Esta função não é robusta. Está aqui por motivos didáticos
+% e demonstrativos. :)
     
-    % --- 0. CONFIGURAÇÕES INICIAIS ---
     PCW_LEN_SYMBOLS = 8; 
     Fs = 1e6; 
     Ts = 1/Fs;
@@ -13,7 +16,7 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
         M = N_levels^2;
     end
     
-    % Constelações e Sequências
+    % Constelações e Sequências de referência
     ref_bits = de2bi(0:M-1, 'left-msb');
     ref_bits = ref_bits.';
     ref_bits = ref_bits(:).';
@@ -25,7 +28,17 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
     L_sig = length(rx_aligned);
     N_train = length(training_seq);
     
-    % --- 1. ESTIMATIVA E CORREÇÃO GROSSEIRA DE CFO ---
+    % Passo 1: Estimativa e correção grosseira de CFO
+
+    % Como funciona:
+    % Pegamos os valores da constelação RECEBIDOS e os TEÓRICOS (isto é, a 
+    % nossa sequência de treino conhecida, que é a mesma no início de todas
+    % as linhas de bits). Dividimos um pelo outro ponto-a-ponto, e, como 
+    % são números complexos, podemos pensar em uma divisão fasorial. 
+    % O resultado é a divisão das amplitudes e a subtração (diferença) das
+    % fases. No final, tiramos uma média e aplicamos a correção de fase ao
+    % vetor RX.
+    
     time_vector_total = (0:L_sig - 1).' * Ts;
     rx_train = rx_aligned(1:N_train);
     phase_error_vec = rx_train ./ training_seq;
@@ -37,8 +50,14 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
     cfo_correction_factor = exp(-1j * cfo_estimate_rad_s * time_vector_total);
     rx_cfo_corrected = rx_aligned .* cfo_correction_factor;
     
-    % --- 2. PLL E EQUALIZAÇÃO ---
-    
+    % Passo 2: Sincronização Fina de Portadora (PLL) e Equalização
+
+    % Como funciona:
+    % A sincronização de portadora (PLL) remove o restante do erro de fase 
+    % residual. Em seguida, o Equalizador Linear (LE) RLS (Recursive Least 
+    % Squares) é configurado e treinado com a sequência conhecida para 
+    % mitigar o ISI (Inter-Symbol Interference) causado pelo canal multipercurso.
+
     carrier_sync = comm.CarrierSynchronizer(...
         'Modulation', 'QAM', 'ModulationPhaseOffset', 'Auto', 'SamplesPerSymbol', 1, ...
         'DampingFactor', damping, 'NormalizedLoopBandwidth', loop_bw); 
@@ -50,10 +69,9 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
     end
     [rx_derotated, ~] = carrier_sync(rx_cfo_corrected);
 
-    % SUBSTITUIÇÃO CRÍTICA: DFE -> LINEAR EQUALIZER (LE)
     le = comm.LinearEqualizer(...
         'Algorithm', 'RLS', ...
-        'NumTaps', fwd_taps, ... % Agora 'NumTaps' é o número total de taps (FFE)
+        'NumTaps', fwd_taps, ...
         'ForgettingFactor', forgetting_f, ...
         'ReferenceTap', ref_tap, ...
         'Constellation', ref_const, ...
@@ -66,9 +84,15 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
     [clean_symbols_raw, ~] = le(rx_derotated, desired_signal, training_flag);
     clean_symbols_raw = clean_symbols_raw(:); 
     
-    % --- 3. RESOLUÇÃO DE AMBIGUIDADE FINAL (PAR + REFLEXÃO) ---
-    
-    % A. Isolar o PCW
+    % Passo 3: Resolução de Ambiguidade de 90 Graus (Swap de Eixos)
+
+    % Como funciona:
+    % Devido à simetria da constelação QPSK/QAM, a PLL pode travar em 
+    % rotações de 0, 90, 180 ou 270 graus. Esta fase testa as 4 rotações 
+    % possíveis (multiplicando por 1, j, -1, -j) usando a Palavra de 
+    % Controle (PCW) e escolhe a rotação que minimiza o Erro Quadrático 
+    % Médio (MSE).
+
     hadamard_len_symbols = N_train - PCW_LEN_SYMBOLS; 
     pcw_start_idx = hadamard_len_symbols + 1;
     pcw_end_idx = hadamard_len_symbols + PCW_LEN_SYMBOLS;
@@ -76,7 +100,7 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
     rx_pcw_symbols = clean_symbols_raw(pcw_start_idx : pcw_end_idx);
     tx_pcw_symbols = training_seq(end - PCW_LEN_SYMBOLS + 1 : end);
     
-    % B. Testar 4 Quadrantes (0, 90, 180, 270 graus)
+    % Testar 4 Quadrantes (0, 90, 180, 270 graus)
     rotation_factors = [1, 1j, -1, -1j]; 
     min_mse = inf;
     best_rotation_factor = 1; 
@@ -85,7 +109,6 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
         rot_factor = rotation_factors(k);
         hypothetical_pcw = rx_pcw_symbols * rot_factor;
         
-        % O LE não usa taps de feedback, mas a lógica de swap de eixos é mantida para o MSE
         if abs(rot_factor) < 1.0001 && abs(rot_factor) > 0.9999 && imag(rot_factor) ~= 0 
              hypothetical_pcw = imag(hypothetical_pcw) + 1j * real(hypothetical_pcw);
         end
@@ -98,8 +121,13 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
         end
     end
     
-    % C. Aplicação da Rotação Vencedora e Swap de Eixos (90/270 graus)
-    
+    % Passo 4: Aplicação da Rotação Vencedora e Resolução de Ambiguidade de 180 Graus
+
+    % Como funciona:
+    % Aplica-se a rotação (e potencial swap I/Q) escolhida na Fase 3. Em seguida, 
+    % um teste final de 180 graus é realizado (multiplexação por -1) para corrigir 
+    % qualquer inversão de sinal remanescente.
+
     if abs(best_rotation_factor) < 1.0001 && abs(best_rotation_factor) > 0.9999 && imag(best_rotation_factor) ~= 0 
         temp_rotated = clean_symbols_raw * best_rotation_factor;
         clean_symbols_temp = imag(temp_rotated) + 1j * real(temp_rotated);
@@ -107,7 +135,14 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
         clean_symbols_temp = clean_symbols_raw * best_rotation_factor;
     end
     
-    % D. Teste Final de 180 Graus (Inversão)
+    % Passo 5: Correção Final de Inversão de Eixos (I ou Q)
+
+    % Como funciona:
+    % Esta etapa é uma correção de ambiguidade que verifica se o sinal médio 
+    % dos eixos I ou Q da PCW foi invertido (por exemplo, I -> -I) em relação 
+    % à sequência transmitida (TX). Aplica uma multiplicação por -1 apenas 
+    % no eixo I ou Q se a inversão for detectada.
+
     rx_pcw_symbols_corrected = clean_symbols_temp(pcw_start_idx : pcw_end_idx);
     mse_0 = mean(abs(rx_pcw_symbols_corrected - tx_pcw_symbols).^2);
     mse_180 = mean(abs((rx_pcw_symbols_corrected * -1) - tx_pcw_symbols).^2);
@@ -119,8 +154,6 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
     end
     
     clean_symbols_temp = clean_symbols_temp * best_rotation_factor_final;
-
-    % E. Correção de Reflexão Final (Para o seu demodulador customizado)
     
     rx_pcw_symbols_final = clean_symbols_temp(pcw_start_idx : pcw_end_idx);
     tx_pcw_symbols_check = tx_pcw_symbols; 
@@ -133,11 +166,10 @@ function [clean_symbols_rotated] = QPSK_equalizer(rx_signal, N_levels, fwd_taps,
     mean_imag_tx = mean(imag(tx_pcw_symbols_check));
     correction_factor_Q = sign(mean_imag_rx) ~= sign(mean_imag_tx);
     
+    % Reconstrução e retorno
     final_real = real(clean_symbols_temp) .* (-1).^correction_factor_I;
     final_imag = imag(clean_symbols_temp) .* (-1).^correction_factor_Q;
     
     clean_symbols_rotated = final_imag + 1j * final_real;
-    
-    % --- 4. RETORNO ---
     clean_symbols_rotated = clean_symbols_rotated.';
 end

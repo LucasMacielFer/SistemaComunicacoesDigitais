@@ -1,5 +1,5 @@
 function bits_limpos = clean_sync_bits(bits_com_headers, BITS_POR_BLOCO, mini_header_size_bits, num_bits_tx_total)
-    
+% Uso geral: Remover os sync_bits do meio das tramas de bits transmitidas
     num_blocos = ceil(num_bits_tx_total / BITS_POR_BLOCO);
     bits_limpos = zeros(1, num_bits_tx_total); 
     idx_leitura = 1;

@@ -1,28 +1,30 @@
 function [decoded_bit_seq] = viterbi_legado(encoded_bit_seq, g1, g2)
+% Uso geral: Decodificar os bits com código convolucional usando o algoritmo
+% de Viterbi. Esta versão foi feita por mim. Deixei-a aqui como código legado,
+% pois agora utilizo a função nativa do MATLAB para maior robustez. Esta
+% função funciona em conjunto com "conv_encoder_legado".
     arguments (Input)
         encoded_bit_seq (1,:) {mustBeNumeric, mustBeMember(encoded_bit_seq, [0, 1])}
         g1 (1,:) char
         g2 (1,:) char
     end
     
-    % --- 1. PREPARAÇÃO E VALIDAÇÃO ---
     if ~isequal(size(g2, 2), size(g1, 2))
         decoded_bit_seq = -1;
         return;
     end
     
-    % Converters G1 e G2 para numérico (necessário para a lógica)
+    % Converters G1 e G2 para numérico
     g1_num = g1 - '0'; 
     g2_num = g2 - '0';
     
     n = size(g2,2); % Quantidade de flipflops + 1 (Constraint length)
     numStates = 2^(n-1);
     
-    % --- 2. CRIAÇÃO DA TABELA DE ESTADOS (STATE TABLE) ---
+    % Tabela de estados
     stateTable = zeros(numStates, 4); 
     
     for i = 0:(numStates - 1)
-        % Obter estado binário atual (representa os flipflops D1, D2, ...)
         bin_vec = de2bi(i, n-1, 'left-msb'); 
 
         % Transição para entrada 0 (Input bit = 0)
@@ -47,17 +49,16 @@ function [decoded_bit_seq] = viterbi_legado(encoded_bit_seq, g1, g2)
         stateTable(i + 1, :) = [nextState0_dec, nextState1_dec, output_if0_dec, output_if1_dec]; 
     end
 
-    % --- 3. PRÉ-PROCESSAMENTO DOS SÍMBOLOS RECEBIDOS ---
+    % Pré-processamento
     % Conversão do vetor de bits de entrada em símbolos decimais (0, 1, 2, 3)
     numSymbols = (length(encoded_bit_seq) / 2);
     encoded_bits_char = char(encoded_bit_seq + '0'); % Conversão necessária para bin2dec funcionar no loop
     receivedSymbols = zeros(1, numSymbols);
     for i = 1:numSymbols
-        % Agrupa 2 bits e converte para decimal (0 a 3)
         receivedSymbols(i) = bin2dec(encoded_bits_char(2*i-1 : 2*i));
     end
     
-    % --- 4. FASE 1: FORWARD PASS (Cálculo das Métricas) ---
+    % Cálculo de métricas
     pathMetrics = inf(numStates, numSymbols + 1); 
     pathMemory = zeros(numStates, numSymbols);  
     pathMetrics(1, 1) = 0; % O caminho começa no estado 0 com métrica 0
@@ -66,7 +67,7 @@ function [decoded_bit_seq] = viterbi_legado(encoded_bit_seq, g1, g2)
         received_symbol_k = receivedSymbols(k);
         
         % Gerar vetor binário do símbolo recebido para cálculo da Distância de Hamming
-        received_bin = dec2bin(received_symbol_k, 2) - '0'; % VETOR NUMÉRICO [0 1]
+        received_bin = dec2bin(received_symbol_k, 2) - '0'; 
         
         for currentState = 0:(numStates - 1) 
             if pathMetrics(currentState + 1, k) == inf
@@ -76,8 +77,8 @@ function [decoded_bit_seq] = viterbi_legado(encoded_bit_seq, g1, g2)
             % Transição para entrada 0
             nextState0 = stateTable(currentState + 1, 1);
             expectedOutput0 = stateTable(currentState + 1, 3);
-            expected_bin0 = dec2bin(expectedOutput0, 2) - '0'; % VETOR NUMÉRICO [0 1]
-            branchMetric0 = sum(abs(received_bin - expected_bin0)); % Distância de Hamming
+            expected_bin0 = dec2bin(expectedOutput0, 2) - '0'; 
+            branchMetric0 = sum(abs(received_bin - expected_bin0)); 
             newPathMetric0 = pathMetrics(currentState + 1, k) + branchMetric0;
             
             if newPathMetric0 < pathMetrics(nextState0 + 1, k + 1)
@@ -88,7 +89,7 @@ function [decoded_bit_seq] = viterbi_legado(encoded_bit_seq, g1, g2)
             % Transição para entrada 1
             nextState1 = stateTable(currentState + 1, 2);
             expectedOutput1 = stateTable(currentState + 1, 4);
-            expected_bin1 = dec2bin(expectedOutput1, 2) - '0'; % VETOR NUMÉRICO [0 1]
+            expected_bin1 = dec2bin(expectedOutput1, 2) - '0'; 
             branchMetric1 = sum(abs(received_bin - expected_bin1));
             newPathMetric1 = pathMetrics(currentState + 1, k) + branchMetric1;
             
@@ -99,8 +100,8 @@ function [decoded_bit_seq] = viterbi_legado(encoded_bit_seq, g1, g2)
         end
     end
 
-    % --- 5. FASE 2: TRACEBACK (Retorna Array Numérico) ---
-    decoded_bit_seq = zeros(1, numSymbols); % Inicializa como array NUMÉRICO (0s e 1s)
+    % Traceback
+    decoded_bit_seq = zeros(1, numSymbols);
     num_flush_bits = size(g1, 2) - 1; 
     
     % Encontra o estado final com a menor métrica de caminho

@@ -1,6 +1,6 @@
 function data = audio_encoder(filename, time, Fs)
-% Função responsável por gerar a sequência de bits referente a um sinal de
-% áudio. O sinal será recuperado de um arquivo de áudio no caminho 
+% Uso geral: gerar a sequência de bits referente a um sinal de
+% áudio. O sinal é recuperado de um arquivo de áudio no caminho 
 % "filename".
 
 % O sinal de áudio discretizado é segmentado em blocos de 20 ms. O retorno

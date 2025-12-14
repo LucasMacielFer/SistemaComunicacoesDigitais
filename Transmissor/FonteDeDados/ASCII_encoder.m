@@ -1,5 +1,5 @@
 function [data] = ASCII_encoder(msg_string)
-% Função utilizada para converter texto em valores numéricos da tabela
+% Uso geral: Converter texto em valores numéricos da tabela
 % ASCII Expandida, e posteriormente convertê-los em bits
 arguments
     msg_string (1,:) char

@@ -1,17 +1,19 @@
 function [eq_grid, ch_estimation] = OFDM_equalizer(neq_grid, params)
-%OFDM_EQUALIZE Summary of this function goes here
-%   Detailed explanation goes here
+% Uso geral: Equalizar uma constelação OFDM, de modo a remover a rotação 
+% causada pelo canal multipercurso e a deriva de frequência causada
+% pelo desvio doppler. Diferente do caso das transmissões single-carrier,
+% aqui é feita uma estimação do canal!
+    
 arguments (Input)
     neq_grid
     params
 end
 
-    [n_rows_grid, num_cols] = size(neq_grid); % Isso vai dar 64
+    [n_rows_grid, num_cols] = size(neq_grid);
     
-    idx_pilots = params.idx_pilots; % Índices lógicos (baseados em 64)
+    idx_pilots = params.idx_pilots;
     val_pilots = params.val_pilots;
     
-    % Matriz de equalização com o tamanho correto (64 x Blocos)
     H_est_full = ones(n_rows_grid, num_cols);
     
     if ~isempty(idx_pilots)
@@ -22,7 +24,6 @@ end
         H_pilots = rx_pilots ./ val_pilots;
         
         % 3. Interpolar
-        % O eixo de interpolação deve ter o tamanho dos dados (64), não da FFT física (512)
         all_carriers = (1:n_rows_grid).'; 
         
         for i = 1:num_cols

@@ -1,4 +1,6 @@
 function rx_wave = multipath_model(tx_wave, t, gains_dB, delays_s)
+% Uso Geral: Simula um canal de múltiplas trajetórias (multipath) adicionando 
+% cópias atrasadas e atenuadas do sinal transmitido (tx_wave).
 
     if length(gains_dB) ~= length(delays_s)
         error('Os vetores de ganhos e atrasos devem ter o mesmo tamanho.');
@@ -6,7 +8,7 @@ function rx_wave = multipath_model(tx_wave, t, gains_dB, delays_s)
 
     if isempty(gains_dB)
         rx_wave = tx_wave;
-        return; % Exit the function if gains_dB is empty
+        return;
     end
 
     tx_wave = tx_wave(:);
@@ -28,6 +30,7 @@ function rx_wave = multipath_model(tx_wave, t, gains_dB, delays_s)
         if delay_samples == 0
             % Caminho sem atraso (Sinal original escalado)
             path_signal = tx_wave;
+
         elseif delay_samples < length(tx_wave)
             % Caminho atrasado:
             % 1. Adiciona zeros no início (o atraso)
@@ -37,7 +40,7 @@ function rx_wave = multipath_model(tx_wave, t, gains_dB, delays_s)
             signal_delayed = [zeros(delay_samples, 1); tx_wave(1:end-delay_samples)];
             path_signal = signal_delayed;
         else
-            % Se o atraso for maior que o sinal todo, esse eco nem aparece
+            % Se o atraso for maior que o sinal todo, não aparece
             path_signal = zeros(size(tx_wave));
         end
         

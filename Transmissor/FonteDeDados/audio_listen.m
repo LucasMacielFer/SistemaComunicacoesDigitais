@@ -1,5 +1,5 @@
 function audio_listen(filename)
-% Função para ouvir um arquivo de áudio
+% Uso geral: Escutar um ficheiro de áudio
 arguments (Input)
     filename (1,:) char;
 end

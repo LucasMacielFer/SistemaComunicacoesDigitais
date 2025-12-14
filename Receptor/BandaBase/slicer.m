@@ -1,8 +1,6 @@
 function symbols_hat = slicer(symbols_rx, N_levels)
-% symbols_rx: vetor de símbolos complexos recebidos
-% N_levels: número de níveis por eixo (sqrt da constelação)
-% Símbolos normalizados entre -1 e 1
-% Retorna symbols_hat: símbolos "decididos" na constelação
+% Uso geral: Decidir qual o símbolo da constelação base é mais próximo de 
+% cada símbolo recebido. QAM-only
 arguments(Input)
     symbols_rx 
     N_levels {mustBeMember(N_levels, [2, 4, 8, 16])}

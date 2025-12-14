@@ -1,6 +1,6 @@
 function symbols = create_qam_symbols(data_bits, N_levels)
-    % RECRIA A LÓGICA DO SEU NRZ_polar_QAM PARA SÍMBOLOS PUROS
-    
+% Uso geral: Recria a lógica do NRZ_polar_QAM. EEsta função é usada nos
+% equalizadores para obter os símbolos QAM a partir dos headers binários.
     M = N_levels^2;
     k = log2(M);
     N_half = log2(N_levels);
@@ -36,5 +36,5 @@ function symbols = create_qam_symbols(data_bits, N_levels)
     norm_factor = sqrt(1 / double(Es));
     
     symbols = symbols_raw * norm_factor;
-    symbols = symbols(:); % Garante vetor coluna
+    symbols = symbols(:);
 end

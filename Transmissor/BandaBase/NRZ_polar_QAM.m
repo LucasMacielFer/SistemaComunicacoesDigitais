@@ -1,14 +1,12 @@
 function [t, I_coeffs, Q_coeffs, I_waveform, Q_waveform, padding_bits] = NRZ_polar_QAM(data, N)
-    % Função utilizada para gerar ondas quadradas para posterior multiplicação
-    % com as portadoras I e Q
+% Uso geral: Gerar símbolos e sinais NRZ em banda base para QPSK e M-QAM.
     arguments (Input)
         data    (1,:) double
         N       {mustBeMember(N, [2, 4, 8, 16])}   % Coeficiente NRZ
     end
     
-    % --- 1. CONFIGURAÇÃO DE TEMPO E ORDEM ---
-    SPB = 200;                       % Amostras por Bit (Fixo para o sistema)
-    FS_SIM = 2000000;                % Frequencia de simulação
+    SPB = 200;                      % Amostras por Bit (Fixo para o sistema)
+    FS_SIM = 2e6;                   % Frequencia de simulação
     
     M = N^2;                        % Ordem da Modulação (16, 64, ou 256)
     k = log2(M);                    % Bits por Símbolo (4, 6, ou 8) <-- Variável correta para reshape
@@ -17,7 +15,7 @@ function [t, I_coeffs, Q_coeffs, I_waveform, Q_waveform, padding_bits] = NRZ_pol
 
     [~, num_bits_orig] = size(data);
     
-    % --- 2. PADDING (CORREÇÃO DE LÓGICA: Deve usar 'k' e não 'N') ---
+    % Padding (caso não haja bits suficientes para fechar o último símbolo)
     resto = mod(num_bits_orig, k);
     padding_bits = 0;
     
@@ -31,19 +29,15 @@ function [t, I_coeffs, Q_coeffs, I_waveform, Q_waveform, padding_bits] = NRZ_pol
     num_simbolos = num_bits / k;
     simbolos_I_Q = zeros(1, num_simbolos); % Vetor que guarda os símbolos complexos
     
-    % O 'bits_row' é agora a única linha da matriz de entrada 'data'
     bits_row = data(1, :); 
     
     % Agrupamento (Organiza em blocos de 'k' bits por linha)
-    % O reshape agora usa K (bits/símbolo)
     bits_mat = reshape(bits_row, k, []).'; 
-    
-    % --- 4. SEPARAÇÃO E CONVERSÃO ---
-    
+        
     I_bits = bits_mat(:, 1:N_half);        % Slicing de 2, 3 ou 4 bits para I
     Q_bits = bits_mat(:, N_half+1:k);      % Os restantes bits para Q
     
-    % Conversão Binário -> Decimal (Obtém o Índice Binário)
+    % Conversão Binário -> Decimal
     I_dec = bi2de(I_bits, 'left-msb');
     Q_dec = bi2de(Q_bits, 'left-msb');
     
@@ -55,12 +49,11 @@ function [t, I_coeffs, Q_coeffs, I_waveform, Q_waveform, padding_bits] = NRZ_pol
     V_I = V_levels(I_gray + 1); 
     V_Q = V_levels(Q_gray + 1);
     
-    % 4E. Combinação (Símbolos Complexos)
-    % Como a saída é um vetor, não há mais necessidade de atribuir a uma matriz 2D (simbolos_I_Q(i, :))
+    % Combinação (Símbolos Complexos)
     simbolos_I_Q = V_I + 1j * V_Q;
     
-    % --- 4. GERAÇÃO DA ONDA QUADRADA ---
-    SPS = SPB * k; % Amostras por Símbolo = 15 * k
+    % Geração da onda quadrada
+    SPS = SPB * k;
     Es = (2/3) * (N^2 - 1);        
     norm_factor = sqrt(1 / double(Es));
 

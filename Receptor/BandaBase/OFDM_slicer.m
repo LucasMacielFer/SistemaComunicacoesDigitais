@@ -1,5 +1,5 @@
 function received_symbols = OFDM_slicer(equalized_grid, ofdm_params)
-% OFDM_demodulate: Extrai dados de uma grade já processada.
+% Uso geral: Extrai dados de uma grade já processada.
 % Não faz FFT nem equalização. Apenas extrai.
 
 arguments(Input)

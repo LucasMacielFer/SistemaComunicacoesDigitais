@@ -1,10 +1,11 @@
 function [symbols_tx, symbols_rx, symbols_eq, bindata_rx, bindata_eq] = simulate_OFDM(bindata_tx, N_levels, subcarriers, pilots, convActive, phase, doppler, multipath, snr)
-   
+% Uso geral: Executar todo o pipeline de simulação para transmissão com
+% modulação BPSK/QAM em OFDM. Há uma função semelhante dentro da
+% aplicação final, que utiliza os parâmetros da classe. O funcionamento é
+% exatamente o mesmo.
+
     dataSize = size(bindata_tx);
     fc = 400e3;
-
-    subcarriers = 64;
-    pilots = 8;
 
     k = 2*log2(N_levels);
     if N_levels == 1, k = 1; end

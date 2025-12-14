@@ -1,13 +1,16 @@
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Transmissor'
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Transmissor\FonteDeDados'
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Transmissor\BandaBase'
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Transmissor\Modulacao'
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor'
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\Demodulacao'
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\BandaBase'
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\Reconstrucao'
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Receptor\Equalizacao'
-addpath 'C:\Users\Lucas-local\Documents\MATLAB\SistemaComunicacoesDigitais\Canal'
+path = which('sistema.m');
+[dir, ~, ~] = fileparts(path);
+
+addpath ([dir '\Transmissor'])
+addpath ([dir '\Transmissor\FonteDeDados'])
+addpath ([dir '\Transmissor\BandaBase'])
+addpath ([dir '\Transmissor\Modulacao'])
+addpath ([dir '\Receptor'])
+addpath ([dir '\Receptor\Demodulacao'])
+addpath ([dir '\Receptor\BandaBase'])
+addpath ([dir '\Receptor\Reconstrucao'])
+addpath ([dir '\Receptor\Equalizacao'])
+addpath ([dir '\Canal'])
 
 % 10.000 bits de teste
 testData = random_bitseq_generator(10,1000);
