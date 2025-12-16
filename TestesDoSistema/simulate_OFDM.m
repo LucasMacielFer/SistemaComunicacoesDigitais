@@ -55,7 +55,7 @@ function [symbols_tx, symbols_rx, symbols_eq, bindata_rx, bindata_eq] = simulate
         [ofdmBaseband, time, params] = OFDM_baseband(symbols, subcarriers, pilots);
 
         [ofdmPassband, time] = modulate_single_carrier(real(ofdmBaseband), imag(ofdmBaseband), time, phase, doppler, fc);
-        ofdmPassband = canal(ofdmPassband, time, multipath, snr, N_levels, convActive);
+        ofdmPassband = canal(ofdmPassband, time, multipath, snr, N_levels, convActive, params);
 
         rxBaseband = demodulate_OFDM(ofdmPassband, time, fc);
         rxDirtyGrid = OFDM_prepare_grid(rxBaseband, params);
@@ -69,8 +69,12 @@ function [symbols_tx, symbols_rx, symbols_eq, bindata_rx, bindata_eq] = simulate
         rxSymbolsFinal = normalize(rxSymbolsFinal);
 
         % Estou a reutilizar o mesmo buffer de antes
-        binData = demapper(rxSymbolsFinal.', N_levels);
-        
+        if N_levels > 1
+            binData = demapper(rxSymbolsFinal.', N_levels);
+        else
+            binData = slicer_demapper_BPSK(rxSymbolsFinal.');
+        end
+
         if convActive
             binData = viterbi(binData, convG1, convG2, dataSize(2));
         end
@@ -89,7 +93,11 @@ function [symbols_tx, symbols_rx, symbols_eq, bindata_rx, bindata_eq] = simulate
         rxSymbolsFinal = normalize(rxSymbolsFinal);
 
         % Estou a reutilizar o mesmo buffer de antes
-        binData = demapper(rxSymbolsFinal.', N_levels);
+        if N_levels > 1
+            binData = demapper(rxSymbolsFinal.', N_levels);
+        else
+            binData = slicer_demapper_BPSK(rxSymbolsFinal.');
+        end
         
         if convActive
             binData = viterbi(binData, convG1, convG2, dataSize(2));

@@ -1,4 +1,4 @@
-path = which('sistema.m');
+ path = which('sistema.m');
 [dir, ~, ~] = fileparts(path);
 
 addpath ([dir '\Transmissor'])
@@ -12,4 +12,4 @@ addpath ([dir '\Receptor\Reconstrucao'])
 addpath ([dir '\Receptor\Equalizacao'])
 addpath ([dir '\Canal'])
 
-simuladorComunicacoesDigitais();
+simuladorComunicacoesDigitais_exported();
